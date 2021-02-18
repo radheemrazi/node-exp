@@ -29,6 +29,7 @@ decl_storage! {
 		// Learn more about declaring storage items:
 		// https://substrate.dev/docs/en/knowledgebase/runtime/storage#declaring-storage-items
 		Something get(fn something): Option<u32>;
+		Result get(fn get_result): Option<i32>;
 	}
 }
 
@@ -39,6 +40,7 @@ decl_event!(
 		/// Event documentation should end with an array that provides descriptive names for event
 		/// parameters. [something, who]
 		SomethingStored(u32, AccountId),
+		Addition(i32,AccountId),
 	}
 );
 
@@ -81,6 +83,21 @@ decl_module! {
 			Ok(())
 		}
 
+		#[weight = 10_000 + T::DbWeight::get().writes(1)]
+		pub fn add(origin, a: i32, b:i32) -> dispatch::DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://substrate.dev/docs/en/knowledgebase/runtime/origin
+			let who = ensure_signed(origin)?;
+			let result = a+b;
+			// Update storage.
+			Result::put(result);
+
+			// Emit an event.
+			Self::deposit_event(RawEvent::Addition(result, who));
+			// Return a successful DispatchResult
+			Ok(())
+		}
 		/// An example dispatchable that may throw a custom error.
 		#[weight = 10_000 + T::DbWeight::get().reads_writes(1,1)]
 		pub fn cause_error(origin) -> dispatch::DispatchResult {
