@@ -261,9 +261,16 @@ impl pallet_sudo::Trait for Runtime {
 	type Call = Call;
 }
 
+parameter_types! {
+    pub const MaxAddend: u32 = 1738;
+    pub const ClearFrequency: u32 = 10;
+}
+
 /// Configure the template pallet in pallets/template.
 impl pallet_template::Trait for Runtime {
 	type Event = Event;
+	type MaxAddend = MaxAddend;
+    type ClearFrequency = ClearFrequency;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -283,6 +290,7 @@ construct_runtime!(
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		// Include the custom logic from the template pallet in the runtime.
 		TemplateModule: pallet_template::{Module, Call, Storage, Event<T>},
+		
 	}
 );
 
